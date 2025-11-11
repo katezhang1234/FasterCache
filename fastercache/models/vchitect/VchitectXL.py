@@ -27,7 +27,7 @@ from diffusers.models.modeling_utils import ModelMixin
 from diffusers.models.normalization import AdaLayerNormContinuous
 from diffusers.utils import USE_PEFT_BACKEND, is_torch_version, logging, scale_lora_layers, unscale_lora_layers
 from diffusers.models.embeddings import CombinedTimestepTextProjEmbeddings, PatchEmbed
-from diffusers.models.transformers.transformer_2d import Transformer2DModelOutput
+from diffusers.models.modeling_outputs import Transformer2DModelOutput
 
 from einops import rearrange
 from torch.distributed._tensor import Shard, Replicate

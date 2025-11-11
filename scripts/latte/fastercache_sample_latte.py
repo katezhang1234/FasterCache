@@ -664,7 +664,7 @@ def main(args):
     set_parallel_manager(1, coordinator.world_size)
     device = f"cuda:{torch.cuda.current_device()}"
 
-    args.pretrained_model_path='../OpenDiT/Latte-1'
+    args.pretrained_model_path='maxin-cn/Latte-1'
     transformer_model = LatteT2V.from_pretrained(
         args.pretrained_model_path, subfolder="transformer", video_length=args.video_length
     ).to(device, dtype=torch.float16)
