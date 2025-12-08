@@ -680,7 +680,7 @@ def main(args):
     tokenizer = T5Tokenizer.from_pretrained(args.pretrained_model_path, subfolder="tokenizer")
     text_encoder = T5EncoderModel.from_pretrained(
         args.pretrained_model_path, subfolder="text_encoder", torch_dtype=torch.float16
-    ).to(device)
+    ).to("cpu")
 
     # set eval mode
     transformer_model.eval()
@@ -796,6 +796,7 @@ def main(args):
     videogen_pipeline = LattePipeline(
         vae=vae, text_encoder=text_encoder, tokenizer=tokenizer, scheduler=scheduler, transformer=transformer_model
     ).to(device)
+    videogen_pipeline.text_encoder.to("cpu")
 
     os.makedirs(args.save_img_path, exist_ok=True)
 
