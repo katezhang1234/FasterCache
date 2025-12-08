@@ -198,10 +198,10 @@ class LattePipeline(DiffusionPipeline):
                     f" {max_length} tokens: {removed_text}"
                 )
 
-            attention_mask = text_inputs.attention_mask.to(device)
+            attention_mask = text_inputs.attention_mask.to("cpu")
             prompt_embeds_attention_mask = attention_mask
 
-            prompt_embeds = self.text_encoder(text_input_ids.to(device), attention_mask=attention_mask)
+            prompt_embeds = self.text_encoder(text_input_ids.to("cpu"), attention_mask=attention_mask)
             prompt_embeds = prompt_embeds[0]
         else:
             prompt_embeds_attention_mask = torch.ones_like(prompt_embeds)
@@ -236,13 +236,13 @@ class LattePipeline(DiffusionPipeline):
                 add_special_tokens=True,
                 return_tensors="pt",
             )
-            attention_mask = uncond_input.attention_mask.to(device)
+            attention_mask = uncond_input.attention_mask.to("cpu")
 
             negative_prompt_embeds = self.text_encoder(
-                uncond_input.input_ids.to(device),
+                uncond_input.input_ids.to("cpu"),
                 attention_mask=attention_mask,
             )
-            negative_prompt_embeds = negative_prompt_embeds[0]
+            negative_prompt_embeds = negative_prompt_embeds[0].to(device)
 
         if do_classifier_free_guidance:
             # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
