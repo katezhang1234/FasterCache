@@ -825,7 +825,7 @@ def main(args):
     # video_grids = []
     for num_prompt, prompt in enumerate(prompts):
 
-        print("Processing the ({}) prompt".format(prompt))
+        print("\n\nProcessing prompt {}: {}".format(num_prompt, prompt))
         transformer_model.counter = 0
 
 
