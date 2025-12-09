@@ -3,7 +3,7 @@ pretrained_model_path: "maxin-cn/Latte-1"
 
 # model config:
 model: LatteT2V
-video_length: 24
+video_length: 32
 image_size: [512, 512]
 # # beta schedule
 beta_start: 0.0001
