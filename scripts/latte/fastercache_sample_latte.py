@@ -861,7 +861,7 @@ def main(args):
                 imageio.mimwrite(
                     args.save_img_path + str(num_prompt)+'_'+prompt[:30].replace(" ", "_") + "_%04d" % args.run_time + ".mp4",
                     videos[0],
-                    fps=16,
+                    fps=12,
                 )
 
 
