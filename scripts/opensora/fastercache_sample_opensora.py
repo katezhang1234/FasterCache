@@ -176,7 +176,6 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
         recovered_uncond = torch.fft.ifft2(combined_fft).real
         recovered_uncond = rearrange(recovered_uncond, "(B T) C H W -> B C T H W", B=bb, C=cc, T=tt, H=hh, W=ww)
         output = torch.cat([single_output,recovered_uncond])
-        return output
     else:
         output = self.fastercache_model_forward_single(x, timestep, y, mask, x_mask, fps, height, width, self.counter, **kwargs)
 
@@ -190,7 +189,19 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
 
             self.cache_uncond_delta = hf_uc - hf_c
             self.cache_uncond_delta_low = lf_uc - lf_c
-        return output
+    
+    print("uncond_delta = ", self.cache_uncond_delta)
+    print("uncond_delta_low = ", self.cache_uncond_delta_low)
+
+    with open(args.metrics_path, 'a', encoding="utf-8") as f:
+        f.write(str(torch.norm(self.cache_uncond_delta)))
+        f.write(str(torch.norm(self.cache_uncond_delta_low)))
+
+    if self.counter % 5 !=0 and self.counter>11:
+        with open(args.metrics_path, 'a', encoding="utf-8") as f:
+            f.write(str(recovered_uncond))
+
+    return output
 
 
 @torch.no_grad()
@@ -474,8 +485,9 @@ def main(args):
                 dt = time.perf_counter() - t0
                 print("Latency = ", dt)
                 with open(args.metrics_path, 'a', encoding="utf-8") as f:
-                    f.write(f"Prompt: {original_batch_prompts[idx]}, Sample: {k}")
-                    f.write(f"Current Time: {time.time():.3f}, Latency: {dt:.6f}\n")
+                    f.write(f"Prompt: {batch_prompts_loop}\n")
+                    f.write(f"Sample: {k}\n")
+                    f.write(f"Current Time: {time.time():.3f}, Latency: {dt:.6f}\n\n")
                 
                 video_clips.append(samples)
 

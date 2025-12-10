@@ -522,7 +522,7 @@ def save_sample(x, save_path=None, fps=8, normalize=True, value_range=(-1, 1), f
         x = x.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 3, 0).to("cpu", torch.uint8)
         write_video(save_path, x, fps=fps)
     if verbose:
-        print(f"Saved to {save_path}")
+        print(f"Saved to {save_path}\n")
     return save_path
 
 
