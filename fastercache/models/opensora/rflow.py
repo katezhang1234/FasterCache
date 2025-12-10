@@ -191,8 +191,10 @@ class RFLOW:
 
         n = len(prompts)
         # text encoding
+        print("text_encoder.device = ", text_encoder.device)
         model_args = text_encoder.encode(prompts)
         y_null = text_encoder.null(n)
+        print("y_null.device = ", y_null.device)
         model_args["y"] = torch.cat([model_args["y"], y_null], 0)
         if additional_args is not None:
             model_args.update(additional_args)

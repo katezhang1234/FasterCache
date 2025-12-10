@@ -488,4 +488,4 @@ def STDiT3_XL_2(from_pretrained=None, **kwargs):
         model = STDiT3(config)
         if from_pretrained is not None:
             load_checkpoint(model, from_pretrained)
-    return model.to("cpu")
+    return model
