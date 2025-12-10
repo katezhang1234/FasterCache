@@ -19,8 +19,7 @@ import torchvision
 import torchvision.transforms as transforms
 from PIL import Image
 from torchvision.datasets.folder import IMG_EXTENSIONS, pil_loader
-# from torchvision.io import write_video
-from torchvision.utils import save_image
+from torchvision.io import write_video
 
 import imageio
 
@@ -521,8 +520,7 @@ def save_sample(x, save_path=None, fps=8, normalize=True, value_range=(-1, 1), f
             x.sub_(low).div_(max(high - low, 1e-5))
 
         x = x.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 3, 0).to("cpu", torch.uint8)
-        # write_video(save_path, x, fps=fps, video_codec="h264")
-        imageio.mimsave(save_path, x, fps=24, video_codec="h264")
+        write_video(save_path, x, fps=fps, video_codec="h264")
     if verbose:
         print(f"Saved to {save_path}")
     return save_path
