@@ -755,15 +755,16 @@ def OpenSoraVAE_V1_2(
         cal_loss=cal_loss,
         micro_frame_size=micro_frame_size,
         shift=shift,
-        scale=scale,
+        scale=scale
     )
 
     if from_pretrained is not None and not os.path.isdir(from_pretrained):
-        model = VideoAutoencoderPipeline.from_pretrained(from_pretrained, **kwargs, device_map="cpu")
+        model = VideoAutoencoderPipeline.from_pretrained(from_pretrained, **kwargs)
     else:
         config = VideoAutoencoderPipelineConfig(**kwargs)
         model = VideoAutoencoderPipeline(config)
 
         if from_pretrained:
             load_checkpoint(model, from_pretrained)
+    model.to("cpu")
     return model
