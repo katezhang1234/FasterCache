@@ -471,7 +471,6 @@ def main(args):
                 # == sampling ==
                 masks = apply_mask_strategy(z, refs, ms, loop_i, align=align)
                 # START TIMER for current video
-                print("START TIMER")
                 t0 = time.perf_counter()
                 samples = scheduler.sample(
                     model,
