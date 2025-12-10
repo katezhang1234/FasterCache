@@ -1,6 +1,6 @@
 resolution: "480p"
 aspect_ratio: "9:16"
-num_frames: 192
+num_frames: 51
 fps: 24
 frame_interval: 1
 
@@ -20,3 +20,4 @@ prompt_path: "prompt.txt"
 flash_attn: True  # turn on for faster inference
 enable_t5_speedup: True  # turn on for less memory usage
 
+loop: 2

@@ -119,6 +119,15 @@ def fastercache_model_forward(
                 self.delta_hf = hf_uc - hf_c
                 self.delta_lf = lf_uc - lf_c
 
+        # TODO: log self.delta_hf, self.delta_lf
+        print("delta_hf = ", self.delta_hf)
+        print("delta_hf_shape = ", self.delta_hf.shape)
+        print("delta_hf_norm = ", float(self.delta_hf.abs().mean().item()))
+
+        print("delta_lf = ", self.delta_lf)
+        print("delta_lf_shape = ", self.delta_lf.shape)
+        print("delta_lf_norm = ", float(self.delta_lf.abs().mean().item()))
+
         return (output,)
 
 
