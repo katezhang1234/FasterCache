@@ -163,7 +163,6 @@ class T5Encoder:
             enable_flash_attention=False,
             enable_jit_fused=True,
             enable_sequence_parallelism=False,
-            enable_sequence_overlap=False,
         )
         shard_former = ShardFormer(shard_config=shard_config)
         optim_model, _ = shard_former.optimize(self.t5.model, policy=T5EncoderPolicy())

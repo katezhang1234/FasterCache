@@ -26,4 +26,4 @@ enable_temporal_attentions: True
 enable_vae_temporal_decoder: True # use temporal vae decoder from SVD, maybe reduce the video flicker (It's not widely tested)
 
 prompt_path: 'prompt.txt'
-num_videos_per_prompt: 5
+num_videos_per_prompt: 2
