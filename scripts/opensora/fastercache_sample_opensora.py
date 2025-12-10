@@ -283,7 +283,7 @@ def main(args):
     # ======================================================
     logger.info("Building models...")
     # == build text-encoder and vae ==
-    text_encoder = T5Encoder(from_pretrained="DeepFloyd/t5-v1_1-xxl", model_max_length=300, device=device, shardformer=args.enable_t5_speedup)
+    text_encoder = T5Encoder(from_pretrained="DeepFloyd/t5-v1_1-xxl", model_max_length=300, device="cpu", shardformer=args.enable_t5_speedup)
     vae = (
         OpenSoraVAE_V1_2(
             from_pretrained="hpcai-tech/OpenSora-VAE-v1.2",
