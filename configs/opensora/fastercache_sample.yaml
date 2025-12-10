@@ -11,7 +11,6 @@ condition_frame_length: 5
 align: 5
 num_sampling_steps: 30
 cfg_scale: 7.0
-aes: 6.5
 
 num_sample: 2
 save_dir: "./results/opensora/"

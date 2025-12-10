@@ -440,6 +440,7 @@ def main(args):
                 batched_loop_idx_list.append(loop_idx_list)
 
             for idx, prompt_segment_list in enumerate(batched_prompt_segment_list):
+                # Doesn't seem very useful
                 batched_prompt_segment_list[idx] = append_score_to_prompts(
                     prompt_segment_list,
                     aes=args.aes,
