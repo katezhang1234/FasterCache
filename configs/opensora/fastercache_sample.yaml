@@ -17,7 +17,7 @@ num_sample: 2
 save_dir: "./results/opensora/"
 metrics_path: "./results/opensora_metrics.txt"
 prompt_as_path: true
-prompt_path: "prompt.txt"
+prompt_path: "prompts/5_per_dim.txt"
 
 # speedup
 flash_attn: True  # turn on for faster inference

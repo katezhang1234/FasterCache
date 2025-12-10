@@ -177,13 +177,13 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
         recovered_uncond = rearrange(recovered_uncond, "(B T) C H W -> B C T H W", B=bb, C=cc, T=tt, H=hh, W=ww)
         output = torch.cat([single_output,recovered_uncond])
 
-        print("uncond_delta = ", self.cache_uncond_delta)
-        print("uncond_delta_low = ", self.cache_uncond_delta_low)
+        # print("uncond_delta = ", self.cache_uncond_delta)
+        # print("uncond_delta_low = ", self.cache_uncond_delta_low)
 
-        with open(args.metrics_path, 'a', encoding="utf-8") as f:
-            f.write(str(torch.norm(self.cache_uncond_delta)))
-            f.write(str(torch.norm(self.cache_uncond_delta_low)))
-            f.write(str(torch.norm(recovered_uncond)))
+        # with open(args.metrics_path, 'a', encoding="utf-8") as f:
+        #     f.write(str(torch.norm(self.cache_uncond_delta)))
+        #     f.write(str(torch.norm(self.cache_uncond_delta_low)))
+        #     f.write(str(torch.norm(recovered_uncond)))
 
     else:
         output = self.fastercache_model_forward_single(x, timestep, y, mask, x_mask, fps, height, width, self.counter, **kwargs)
@@ -199,12 +199,12 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
             self.cache_uncond_delta = hf_uc - hf_c
             self.cache_uncond_delta_low = lf_uc - lf_c
 
-            print("uncond_delta = ", self.cache_uncond_delta)
-            print("uncond_delta_low = ", self.cache_uncond_delta_low)
+            # print("uncond_delta = ", self.cache_uncond_delta)
+            # print("uncond_delta_low = ", self.cache_uncond_delta_low)
 
-            with open(args.metrics_path, 'a', encoding="utf-8") as f:
-                f.write(str(torch.norm(self.cache_uncond_delta)))
-                f.write(str(torch.norm(self.cache_uncond_delta_low)))
+            # with open(args.metrics_path, 'a', encoding="utf-8") as f:
+            #     f.write(str(torch.norm(self.cache_uncond_delta)))
+            #     f.write(str(torch.norm(self.cache_uncond_delta_low)))
 
     return output
 
