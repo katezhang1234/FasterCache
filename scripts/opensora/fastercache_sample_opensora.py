@@ -195,6 +195,8 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
 
 @torch.no_grad()
 def fastercache_model_forward_single(self, x, timestep, y, mask=None, x_mask=None, fps=None, height=None, width=None, counter=None, **kwargs):
+    mask = mask.to("cuda")
+
     dtype = self.x_embedder.proj.weight.dtype
     B = x.size(0)
     x = x.to(dtype)
