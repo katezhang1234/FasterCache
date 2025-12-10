@@ -454,6 +454,9 @@ def main(args):
 
                 # == sampling ==
                 masks = apply_mask_strategy(z, refs, ms, loop_i, align=align)
+                # START TIMER for current video
+                print("START TIMER")
+                t0 = time.perf_counter()
                 samples = scheduler.sample(
                     model,
                     text_encoder,
@@ -466,6 +469,14 @@ def main(args):
                 )
 
                 samples = vae.decode(samples.to(dtype), num_frames=num_frames)
+                
+                # END TIMER for current video
+                dt = time.perf_counter() - t0
+                print("Latency = ", dt)
+                with open(args.metrics_path, 'a', encoding="utf-8") as f:
+                    f.write(f"Prompt: {original_batch_prompts[idx]}, Sample: {k}")
+                    f.write(f"Current Time: {time.time():.3f}, Latency: {dt:.6f}\n")
+                
                 video_clips.append(samples)
 
             # == save samples ==
@@ -507,6 +518,7 @@ if __name__ == "__main__":
 
     # output
     parser.add_argument("--save-dir", default="./samples/opensora", type=str, help="path to save generated samples")
+    parser.add_argument("--metrics-path", default="./samples/metrics", type=str, help="path to save metrics (e.g latency) for each generated video")
     parser.add_argument("--num-sample", default=1, type=int, help="number of samples to generate for one prompt")
     parser.add_argument("--prompt-as-path", action="store_true", help="use prompt as path to save samples")
     parser.add_argument("--verbose", default=2, type=int, help="verbose level")

@@ -13,11 +13,12 @@ num_sampling_steps: 30
 cfg_scale: 7.0
 aes: 6.5
 
+num_sample: 2
+save_dir: "./results/opensora/"
+metrics_path: "./results/opensora_metrics.txt"
 prompt_as_path: true
 prompt_path: "prompt.txt"
 
 # speedup
 flash_attn: True  # turn on for faster inference
 enable_t5_speedup: True  # turn on for less memory usage
-
-loop: 2
