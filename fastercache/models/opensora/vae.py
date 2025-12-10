@@ -759,7 +759,7 @@ def OpenSoraVAE_V1_2(
     )
 
     if from_pretrained is not None and not os.path.isdir(from_pretrained):
-        model = VideoAutoencoderPipeline.from_pretrained(from_pretrained, **kwargs)
+        model = VideoAutoencoderPipeline.from_pretrained(from_pretrained, **kwargs, device_map="cpu")
     else:
         config = VideoAutoencoderPipelineConfig(**kwargs)
         model = VideoAutoencoderPipeline(config)

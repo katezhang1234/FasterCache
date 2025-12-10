@@ -88,12 +88,14 @@ class T5Embedder:
             from_pretrained,
             cache_dir=cache_dir,
             local_files_only=local_files_only,
+            device_map="cpu"
         )
         self.model = T5EncoderModel.from_pretrained(
             from_pretrained,
             cache_dir=cache_dir,
             local_files_only=local_files_only,
             **t5_model_kwargs,
+            device_map="cpu"
         ).eval()
         self.model_max_length = model_max_length
 
@@ -132,7 +134,7 @@ class T5Encoder:
         assert from_pretrained is not None, "Please specify the path to the T5 model"
 
         self.t5 = T5Embedder(
-            device=device,
+            device="cpu",
             torch_dtype=dtype,
             from_pretrained=from_pretrained,
             cache_dir=cache_dir,

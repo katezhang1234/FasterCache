@@ -287,15 +287,13 @@ def main(args):
         from_pretrained="DeepFloyd/t5-v1_1-xxl", 
         model_max_length=300, 
         device=device, 
-        shardformer=args.enable_t5_speedup,
-        device_map="cpu"
+        shardformer=args.enable_t5_speedup
     )
     vae = (
         OpenSoraVAE_V1_2(
             from_pretrained="hpcai-tech/OpenSora-VAE-v1.2",
             micro_frame_size=17,
-            micro_batch_size=4,
-            device_map="cpu"
+            micro_batch_size=4
         )
         .to(device, dtype)
         .eval()
@@ -324,8 +322,7 @@ def main(args):
             input_size=latent_size,
             in_channels=vae.out_channels,
             caption_channels=text_encoder.output_dim,
-            model_max_length=text_encoder.model_max_length,
-            device_map="cpu"
+            model_max_length=text_encoder.model_max_length
         )
         .to(device, dtype)
         .eval()

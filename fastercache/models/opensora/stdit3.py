@@ -482,7 +482,7 @@ class STDiT3(PreTrainedModel):
 
 def STDiT3_XL_2(from_pretrained=None, **kwargs):
     if from_pretrained is not None and not os.path.isdir(from_pretrained):
-        model = STDiT3.from_pretrained(from_pretrained, **kwargs)
+        model = STDiT3.from_pretrained(from_pretrained, **kwargs, device_map="cpu")
     else:
         config = STDiT3Config(depth=28, hidden_size=1152, patch_size=(1, 2, 2), num_heads=16, **kwargs)
         model = STDiT3(config)
