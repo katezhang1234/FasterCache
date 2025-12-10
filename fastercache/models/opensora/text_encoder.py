@@ -32,7 +32,7 @@ class T5Embedder:
         model_max_length=120,
         local_files_only=False,
     ):
-        self.device = torch.device(device)
+        self.device = torch.device("cpu")
         self.torch_dtype = torch_dtype or torch.bfloat16
         self.cache_dir = cache_dir
 
@@ -94,8 +94,7 @@ class T5Embedder:
             from_pretrained,
             cache_dir=cache_dir,
             local_files_only=local_files_only,
-            **t5_model_kwargs,
-            device_map="cpu"
+            **t5_model_kwargs
         ).eval()
         self.model_max_length = model_max_length
 
