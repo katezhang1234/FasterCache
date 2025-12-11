@@ -484,11 +484,12 @@ def main(args):
 
             # Write latency to output file
             print("Latency = ", dt, "\n")
-            row_df = pd.DataFrame([[batch_prompts, k, f"{time.time():.3f}", f"{dt:.6f}"]],
+            row_df = pd.DataFrame([[batch_prompts[0], k, f"{time.time():.3f}", f"{dt:.6f}"]],
                         columns=["Prompt", "Sample", "Current Time", "Latency"])
             row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0), index=False)
             
             # Write timestep metrics to output file
+            mse_list = [mse.cpu().item() for mse in mse_list]
             print("mse_list = ", mse_list, "\n")
             col_df = pd.DataFrame(mse_list, columns=["MSE"])
             timestep_file = args.metrics_dir + batch_prompts + "-" + str(k) + "_" + str(i) + ".mp4"
