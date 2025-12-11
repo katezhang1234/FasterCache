@@ -494,7 +494,7 @@ def main(args):
             col_df = pd.DataFrame(mse_list, columns=["MSE"])
             if not(os.path.exists(args.metrics_dir)):
                 os.makedirs(args.metrics_dir)
-            timestep_file = args.metrics_dir + batch_prompts[0] + "-" + str(k) + "_" + str(i) + ".mp4"
+            timestep_file = args.metrics_dir + batch_prompts[0] + "-" + str(k) + "_" + str(i) + ".csv"
             col_df.to_csv(timestep_file, mode="w", header=True, index=False)
 
             # == save samples ==
