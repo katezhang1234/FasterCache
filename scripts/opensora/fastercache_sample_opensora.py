@@ -492,7 +492,7 @@ def main(args):
             mse_list = [mse.cpu().item() for mse in mse_list]
             print("mse_list = ", mse_list, "\n")
             col_df = pd.DataFrame(mse_list, columns=["MSE"])
-            timestep_file = args.metrics_dir + batch_prompts + "-" + str(k) + "_" + str(i) + ".mp4"
+            timestep_file = args.metrics_dir + batch_prompts[0] + "-" + str(k) + "_" + str(i) + ".mp4"
             col_df.to_csv(timestep_file, mode="w", header=True, index=False)
 
             # == save samples ==
