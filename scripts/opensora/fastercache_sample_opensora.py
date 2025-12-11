@@ -486,7 +486,7 @@ def main(args):
             print("Latency = ", dt)
             row_df = pd.DataFrame([[batch_prompts[0], k, f"{time.time():.3f}", f"{dt:.6f}"]],
                         columns=["Prompt", "Sample", "Current Time", "Latency"])
-            row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0), index=False)
+            row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0 and k==0), index=False)
             
             # Write timestep metrics to output file
             mse_list = [mse.cpu().item() for mse in mse_list]
