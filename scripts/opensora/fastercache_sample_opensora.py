@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import pandas as pd
 
 import colossalai
 import torch
@@ -329,11 +330,9 @@ def main(args):
 
     for _name, _module in model.named_modules():
         if _module.__class__.__name__=='STDiT3':
-            print("NAME == STDiT3")
             _module.__class__.forward  = fastercache_model_forward
             _module.__class__.fastercache_model_forward_single = fastercache_model_forward_single
         if _module.__class__.__name__=='STDiT3Block':
-            print("NAME == STDiT3Block")
             _module.__class__.__call__  = fastercache_STDiT3Block_forward
 
     text_encoder.y_embedder = model.y_embedder 
