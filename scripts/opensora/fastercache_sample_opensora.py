@@ -483,15 +483,17 @@ def main(args):
                 video_clips.append(samples)
 
             # Write latency to output file
-            print("Latency = ", dt, "\n")
+            print("Latency = ", dt)
             row_df = pd.DataFrame([[batch_prompts[0], k, f"{time.time():.3f}", f"{dt:.6f}"]],
                         columns=["Prompt", "Sample", "Current Time", "Latency"])
             row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0), index=False)
             
             # Write timestep metrics to output file
             mse_list = [mse.cpu().item() for mse in mse_list]
-            print("mse_list = ", mse_list, "\n")
+            print("mse_list[:5] = ", mse_list[:5], "\n")
             col_df = pd.DataFrame(mse_list, columns=["MSE"])
+            if not(os.path.exists(args.metrics_dir)):
+                os.makedirs(args.metrics_dir)
             timestep_file = args.metrics_dir + batch_prompts[0] + "-" + str(k) + "_" + str(i) + ".mp4"
             col_df.to_csv(timestep_file, mode="w", header=True, index=False)
 
