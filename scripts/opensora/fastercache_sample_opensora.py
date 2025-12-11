@@ -484,7 +484,7 @@ def main(args):
 
             # Write latency to output file
             print("Latency = ", dt, "\n")
-            row_df = pd.DataFrame([batch_prompts, k, f"{time.time():.3f}", f"{dt:.6f}"],
+            row_df = pd.DataFrame([[batch_prompts, k, f"{time.time():.3f}", f"{dt:.6f}"]],
                         columns=["Prompt", "Sample", "Current Time", "Latency"])
             row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0), index=False)
             
