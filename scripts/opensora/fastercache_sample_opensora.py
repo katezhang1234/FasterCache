@@ -156,7 +156,7 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
         self.counter = 0
     self.counter += 1
 
-    if self.counter % 5 !=0 and self.counter>11:
+    if self.counter % 2 !=0 and self.counter>11:
         x_single, timestep_single, y_single, mask_single, x_mask_single = x[:1], timestep[:1], y[:1], mask, x_mask[:1]
         single_output = self.fastercache_model_forward_single(x_single, timestep_single, y_single, mask_single, x_mask_single, fps, height, width, self.counter, **kwargs)
 
@@ -179,7 +179,7 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
         output = torch.cat([single_output,recovered_uncond])
 
     else:
-        # Full inference conducted every 5 timesteps, starting from 1/3 the total sampling steps
+        # Full inference conducted every 2 timesteps, starting from 1/3 the total sampling steps
         output = self.fastercache_model_forward_single(x, timestep, y, mask, x_mask, fps, height, width, self.counter, **kwargs)
 
         if self.counter>=10:
