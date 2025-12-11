@@ -72,7 +72,7 @@ def fastercache_STDiT3Block_forward(
             ).chunk(6, dim=1)
 
         if counter>7 and counter%2==0:
-            x_m = self.attn_cache[1][:x.shape[0]]
+            x_m = self.attn_cache[1][:x.shape[0]] + (self.attn_cache[1][:x.shape[0]] - self.attn_cache[0][:x.shape[0]]) * 0.3
         else:
             x_m = t2i_modulate(self.norm1(x), shift_msa, scale_msa)
             if x_mask is not None:
