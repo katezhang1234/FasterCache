@@ -17,7 +17,7 @@ save_dir: "./results/opensora/"
 metrics_filepath: "./results/opensora_metrics.csv"
 metrics_dir: "./results/opensora_metrics/"
 prompt_as_path: true
-prompt_path: "prompts/5_per_dim.txt"
+prompt_path: "prompts/motion_prompts.txt"
 
 # speedup
 flash_attn: True  # turn on for faster inference
