@@ -14,7 +14,8 @@ cfg_scale: 7.0
 
 num_sample: 2
 save_dir: "./results/opensora/"
-metrics_path: "./results/opensora_metrics.txt"
+metrics_filepath: "./results/opensora_metrics.csv"
+metrics_dir: "./results/opensora_metrics/"
 prompt_as_path: true
 prompt_path: "prompts/5_per_dim.txt"
 

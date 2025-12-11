@@ -184,6 +184,7 @@ class RFLOW:
         guidance_scale=None,
         progress=True,
         verbose=False,
+        mse_list=[]
     ):
         # if no specific guidance scale is provided, use the default scale when initializing the scheduler
         if guidance_scale is None:
@@ -232,6 +233,9 @@ class RFLOW:
             pred = model(z_in, t, **model_args).chunk(2, dim=1)[0]
             pred_cond, pred_uncond = pred.chunk(2, dim=0)
             v_pred = pred_uncond + guidance_scale * (pred_cond - pred_uncond)
+
+            mse = torch.mean((pred_cond - pred_uncond) ** 2)
+            mse_list.append(mse)
 
             ######SAVE
             # torch.save(pred_cond.detach(),'feats/'+str(i)+'_'+str(int(t[0]))+'_cond.pt')

@@ -177,15 +177,8 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
         recovered_uncond = rearrange(recovered_uncond, "(B T) C H W -> B C T H W", B=bb, C=cc, T=tt, H=hh, W=ww)
         output = torch.cat([single_output,recovered_uncond])
 
-        # print("uncond_delta = ", self.cache_uncond_delta)
-        # print("uncond_delta_low = ", self.cache_uncond_delta_low)
-
-        # with open(args.metrics_path, 'a', encoding="utf-8") as f:
-        #     f.write(str(torch.norm(self.cache_uncond_delta)))
-        #     f.write(str(torch.norm(self.cache_uncond_delta_low)))
-        #     f.write(str(torch.norm(recovered_uncond)))
-
     else:
+        # Full inference conducted every 5 timesteps, starting from 1/3 the total sampling steps
         output = self.fastercache_model_forward_single(x, timestep, y, mask, x_mask, fps, height, width, self.counter, **kwargs)
 
         if self.counter>=10:
@@ -198,13 +191,6 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
 
             self.cache_uncond_delta = hf_uc - hf_c
             self.cache_uncond_delta_low = lf_uc - lf_c
-
-            # print("uncond_delta = ", self.cache_uncond_delta)
-            # print("uncond_delta_low = ", self.cache_uncond_delta_low)
-
-            # with open(args.metrics_path, 'a', encoding="utf-8") as f:
-            #     f.write(str(torch.norm(self.cache_uncond_delta)))
-            #     f.write(str(torch.norm(self.cache_uncond_delta_low)))
 
     return output
 
@@ -343,9 +329,11 @@ def main(args):
 
     for _name, _module in model.named_modules():
         if _module.__class__.__name__=='STDiT3':
+            print("NAME == STDiT3")
             _module.__class__.forward  = fastercache_model_forward
             _module.__class__.fastercache_model_forward_single = fastercache_model_forward_single
         if _module.__class__.__name__=='STDiT3Block':
+            print("NAME == STDiT3Block")
             _module.__class__.__call__  = fastercache_STDiT3Block_forward
 
     text_encoder.y_embedder = model.y_embedder 
@@ -457,6 +445,9 @@ def main(args):
             for prompt_segment_list, loop_idx_list in zip(batched_prompt_segment_list, batched_loop_idx_list):
                 batch_prompts.append(merge_prompt(prompt_segment_list, loop_idx_list))
 
+            mse_list = []
+            dt = 0
+
             # == Iter over loop generation ==
             video_clips = []
             for loop_i in range(loop):
@@ -471,7 +462,8 @@ def main(args):
 
                 # == sampling ==
                 masks = apply_mask_strategy(z, refs, ms, loop_i, align=align)
-                # START TIMER for current video
+
+                # START TIMER for current video loop
                 t0 = time.perf_counter()
                 samples = scheduler.sample(
                     model,
@@ -482,19 +474,26 @@ def main(args):
                     additional_args=model_args,
                     progress=verbose >= 2,
                     mask=masks,
+                    mse_list=mse_list,
                 )
 
                 samples = vae.decode(samples.to(dtype), num_frames=num_frames)
                 
-                # END TIMER for current video
-                dt = time.perf_counter() - t0
-                print("Latency = ", dt)
-                with open(args.metrics_path, 'a', encoding="utf-8") as f:
-                    f.write(f"Prompt: {batch_prompts_loop}\n")
-                    f.write(f"Sample: {k}\n")
-                    f.write(f"Current Time: {time.time():.3f}, Latency: {dt:.6f}\n\n")
-                
+                # END TIMER for current video loop
+                dt += time.perf_counter() - t0
                 video_clips.append(samples)
+
+            # Write latency to output file
+            print("Latency = ", dt, "\n")
+            row_df = pd.DataFrame([batch_prompts, k, f"{time.time():.3f}", f"{dt:.6f}"],
+                        columns=["Prompt", "Sample", "Current Time", "Latency"])
+            row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0), index=False)
+            
+            # Write timestep metrics to output file
+            print("mse_list = ", mse_list, "\n")
+            col_df = pd.DataFrame(mse_list, columns=["MSE"])
+            timestep_file = args.metrics_dir + batch_prompts + "-" + str(k) + "_" + str(i) + ".mp4"
+            col_df.to_csv(timestep_file, mode="w", header=True, index=False)
 
             # == save samples ==
             if coordinator.is_master():
@@ -534,8 +533,9 @@ if __name__ == "__main__":
     parser.add_argument("--dtype", default="bf16", type=str, help="data type")
 
     # output
-    parser.add_argument("--save-dir", default="./samples/opensora", type=str, help="path to save generated samples")
-    parser.add_argument("--metrics-path", default="./samples/metrics", type=str, help="path to save metrics (e.g latency) for each generated video")
+    parser.add_argument("--save-dir", default="./samples/opensora/", type=str, help="path to save generated samples")
+    parser.add_argument("--metrics-filepath", default="./samples/opensora_metrics.csv", type=str, help="path to save high-level video metrics (e.g. latency)")
+    parser.add_argument("--metrics-dir", default="./samples/opensora_metrics/", type=str, help="path to save per-timestep metrics for a video (e.g. MSE)")
     parser.add_argument("--num-sample", default=1, type=int, help="number of samples to generate for one prompt")
     parser.add_argument("--prompt-as-path", action="store_true", help="use prompt as path to save samples")
     parser.add_argument("--verbose", default=2, type=int, help="verbose level")
