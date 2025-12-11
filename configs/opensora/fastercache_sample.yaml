@@ -1,6 +1,6 @@
 resolution: "480p"
 aspect_ratio: "9:16"
-num_frames: 192
+num_frames: 51
 fps: 24
 frame_interval: 1
 
@@ -11,12 +11,14 @@ condition_frame_length: 5
 align: 5
 num_sampling_steps: 30
 cfg_scale: 7.0
-aes: 6.5
 
+num_sample: 2
+save_dir: "./results/opensora/"
+metrics_filepath: "./results/opensora_metrics.csv"
+metrics_dir: "./results/opensora_metrics/"
 prompt_as_path: true
-prompt_path: "prompt.txt"
+prompt_path: "prompts/5_per_dim.txt"
 
 # speedup
 flash_attn: True  # turn on for faster inference
 enable_t5_speedup: True  # turn on for less memory usage
-

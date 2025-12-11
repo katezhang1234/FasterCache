@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import pandas as pd
 
 import colossalai
 import torch
@@ -176,8 +177,9 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
         recovered_uncond = torch.fft.ifft2(combined_fft).real
         recovered_uncond = rearrange(recovered_uncond, "(B T) C H W -> B C T H W", B=bb, C=cc, T=tt, H=hh, W=ww)
         output = torch.cat([single_output,recovered_uncond])
-        return output
+
     else:
+        # Full inference conducted every 5 timesteps, starting from 1/3 the total sampling steps
         output = self.fastercache_model_forward_single(x, timestep, y, mask, x_mask, fps, height, width, self.counter, **kwargs)
 
         if self.counter>=10:
@@ -190,7 +192,8 @@ def fastercache_model_forward(self, x, timestep, y, mask=None, x_mask=None, fps=
 
             self.cache_uncond_delta = hf_uc - hf_c
             self.cache_uncond_delta_low = lf_uc - lf_c
-        return output
+
+    return output
 
 
 @torch.no_grad()
@@ -424,6 +427,7 @@ def main(args):
                 batched_loop_idx_list.append(loop_idx_list)
 
             for idx, prompt_segment_list in enumerate(batched_prompt_segment_list):
+                # Doesn't seem very useful
                 batched_prompt_segment_list[idx] = append_score_to_prompts(
                     prompt_segment_list,
                     aes=args.aes,
@@ -440,6 +444,9 @@ def main(args):
             for prompt_segment_list, loop_idx_list in zip(batched_prompt_segment_list, batched_loop_idx_list):
                 batch_prompts.append(merge_prompt(prompt_segment_list, loop_idx_list))
 
+            mse_list = []
+            dt = 0
+
             # == Iter over loop generation ==
             video_clips = []
             for loop_i in range(loop):
@@ -454,6 +461,9 @@ def main(args):
 
                 # == sampling ==
                 masks = apply_mask_strategy(z, refs, ms, loop_i, align=align)
+
+                # START TIMER for current video loop
+                t0 = time.perf_counter()
                 samples = scheduler.sample(
                     model,
                     text_encoder,
@@ -463,10 +473,29 @@ def main(args):
                     additional_args=model_args,
                     progress=verbose >= 2,
                     mask=masks,
+                    mse_list=mse_list,
                 )
 
                 samples = vae.decode(samples.to(dtype), num_frames=num_frames)
+                
+                # END TIMER for current video loop
+                dt += time.perf_counter() - t0
                 video_clips.append(samples)
+
+            # Write latency to output file
+            print("Latency = ", dt)
+            row_df = pd.DataFrame([[batch_prompts[0], k, f"{time.time():.3f}", f"{dt:.6f}"]],
+                        columns=["Prompt", "Sample", "Current Time", "Latency"])
+            row_df.to_csv(args.metrics_filepath, mode="a", header=(i==0 and k==0), index=False)
+            
+            # Write timestep metrics to output file
+            mse_list = [mse.cpu().item() for mse in mse_list]
+            print("mse_list[:5] = ", mse_list[:5], "\n")
+            col_df = pd.DataFrame(mse_list, columns=["MSE"])
+            if not(os.path.exists(args.metrics_dir)):
+                os.makedirs(args.metrics_dir)
+            timestep_file = args.metrics_dir + batch_prompts[0] + "-" + str(k) + "_" + str(i) + ".csv"
+            col_df.to_csv(timestep_file, mode="w", header=True, index=False)
 
             # == save samples ==
             if coordinator.is_master():
@@ -506,7 +535,9 @@ if __name__ == "__main__":
     parser.add_argument("--dtype", default="bf16", type=str, help="data type")
 
     # output
-    parser.add_argument("--save-dir", default="./samples/opensora", type=str, help="path to save generated samples")
+    parser.add_argument("--save-dir", default="./samples/opensora/", type=str, help="path to save generated samples")
+    parser.add_argument("--metrics-filepath", default="./samples/opensora_metrics.csv", type=str, help="path to save high-level video metrics (e.g. latency)")
+    parser.add_argument("--metrics-dir", default="./samples/opensora_metrics/", type=str, help="path to save per-timestep metrics for a video (e.g. MSE)")
     parser.add_argument("--num-sample", default=1, type=int, help="number of samples to generate for one prompt")
     parser.add_argument("--prompt-as-path", action="store_true", help="use prompt as path to save samples")
     parser.add_argument("--verbose", default=2, type=int, help="verbose level")
